@@ -951,6 +951,22 @@
       text-decoration: none
     }
 
+    .pdf-viewer {
+      height: calc(100dvh - 320px);
+      min-height: 620px;
+      background: white;
+      border: 3px solid var(--line);
+      border-radius: 24px;
+      overflow: hidden
+    }
+
+    .pdf-viewer iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: white
+    }
+
     footer {
       background: white;
       border-top: 2px solid var(--line);
@@ -1011,7 +1027,8 @@
       z-index: 80;
       background: #edf2ff;
       border-top: 8px solid var(--gold);
-      padding: 18px 28px 25px;
+      padding: 16px 46px 22px;
+      overflow-x: hidden;
       box-shadow: 0 -24px 60px rgba(7, 30, 99, .28);
       transform: translateY(105%);
       transition: transform .25s ease
@@ -1046,12 +1063,14 @@
       display: flex;
       justify-content: center;
       gap: 9px;
-      margin-top: 9px
+      margin: 9px auto 0;
+      width: min(100%, 920px)
     }
 
     .key {
       height: 66px;
-      min-width: 82px;
+      width: 78px;
+      min-width: 0;
       border: 2px solid #b8c8f3;
       border-radius: 14px;
       background: white;
@@ -1068,12 +1087,12 @@
     }
 
     .key.wide {
-      min-width: 170px;
+      width: 165px;
       font-size: 18px
     }
 
     .key.space {
-      min-width: 360px
+      width: 330px
     }
 
     .keyboard-hint {
@@ -1197,6 +1216,7 @@
 
       .key {
         min-width: 0;
+        width: auto;
         flex: 1;
         height: 58px;
         font-size: 20px
@@ -1428,10 +1448,21 @@
         </div>
         <div class="note">Each step preserves the published client action, agency action, applicable fee, processing
           time, and responsible personnel. Confirm any updated requirement or fee with the responsible office.</div><a
-          class="charter-link" id="charterLink" href="#" target="_blank" rel="noopener">Open this page in the uploaded
-          Citizen’s Charter</a>
+          class="charter-link" id="charterLink" type="button">Open this page in the Citizen’s Charter</button>
       </section>
-    </main>
+      <section class="screen" id="pdfScreen">
+        <div class="topline"><button class="back" data-back="detailScreen" aria-label="Back to service details"><svg
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="m15 18-6-6 6-6" />
+            </svg></button>
+          <div>
+            <div class="kicker">Uploaded Citizen’s Charter</div>
+            <h2 id="pdfTitle">Charter page</h2>
+          </div>
+        </div>
+        <div class="pdf-viewer"><iframe id="pdfFrame" title="Citizen’s Charter PDF"></iframe></div>
+      </section>
+  </main>
     <section class="keyboard" id="keyboard" aria-label="On-screen keyboard" aria-hidden="true">
       <div class="keyboard-head"><b>Type your search</b><button class="keyboard-close" data-key-action="close">Hide
           keyboard</button></div>
@@ -1495,12 +1526,13 @@
     function openDepartment(name) { activeDepartment = departments.find(d => d.name === name); qs('#departmentTitle').textContent = officeLabel(activeDepartment.name); qs('#departmentSummary').textContent = `${activeDepartment.services.length} published service${activeDepartment.services.length === 1 ? '' : 's'}`; qs('#serviceSearch').value = ''; renderServices(); show('departmentScreen') }
     function renderServices() { const term = qs('#serviceSearch').value.trim().toLowerCase(); const list = activeDepartment.services.map(id => byId.get(id)).filter(s => (s.title + ' ' + s.description).toLowerCase().includes(term)); qs('#clearService').classList.toggle('show', !!term); qs('#serviceList').innerHTML = list.map(s => `<button class="service" data-service="${s.id}"><b>${s.title}</b><span class="meta">${s.classification} · ${s.duration}</span><span class="page">Page ${s.page}</span></button>`).join(''); qs('#serviceEmpty').classList.toggle('show', !list.length) }
     function isHeading(text) { return /^(NEW|RENEWAL|REGULATORY)$/.test(text) || /^FOR [A-Z].*:?$/.test(text) }
-    function openService(id) { const s = byId.get(id), abbr = officeAbbreviations[s.department]; qs('#serviceTitle').textContent = s.title; qs('#serviceOffice').textContent = `${s.office || s.department}${abbr && !(s.office || '').includes(`(${abbr})`) ? ` (${abbr})` : ''}`; qs('#servicePage').textContent = `Charter page ${s.page}`; qs('#serviceTransaction').textContent = s.transaction || 'External service'; qs('#serviceClass').textContent = s.classification || 'Not specified'; qs('#serviceDuration').textContent = s.duration || 'Not specified'; qs('#serviceDescription').textContent = s.description || 'Refer to the published Citizen’s Charter for this service.'; qs('#serviceEligible').textContent = s.eligible || 'General public / qualified applicants'; qs('#serviceRequirements').innerHTML = s.requirements.map(r => `<li class="${isHeading(r) ? 'heading' : ''}">${r}</li>`).join('') || '<li>No documentary requirement is listed.</li>'; qs('#serviceSteps').innerHTML = s.steps.map(step => `<article class="step"><span class="step-num">${step.number}</span><p>${step.detail}</p></article>`).join('') || `<article class="step"><span class="step-num">1</span><p>${s.processText || 'Proceed to the responsible office for assistance.'}</p></article>`; qs('#charterLink').href = `CITIZEN-CHARTER-2023-4th-edition-updated.pdf#page=${s.page}`; show('detailScreen') }
+    function openService(id) { const s = byId.get(id), abbr = officeAbbreviations[s.department]; qs('#serviceTitle').textContent = s.title; qs('#serviceOffice').textContent = `${s.office || s.department}${abbr && !(s.office || '').includes(`(${abbr})`) ? ` (${abbr})` : ''}`; qs('#servicePage').textContent = `Charter page ${s.page}`; qs('#serviceTransaction').textContent = s.transaction || 'External service'; qs('#serviceClass').textContent = s.classification || 'Not specified'; qs('#serviceDuration').textContent = s.duration || 'Not specified'; qs('#serviceDescription').textContent = s.description || 'Refer to the published Citizen’s Charter for this service.'; qs('#serviceEligible').textContent = s.eligible || 'General public / qualified applicants'; qs('#serviceRequirements').innerHTML = s.requirements.map(r => `<li class="${isHeading(r) ? 'heading' : ''}">${r}</li>`).join('') || '<li>No documentary requirement is listed.</li>'; qs('#serviceSteps').innerHTML = s.steps.map(step => `<article class="step"><span class="step-num">${step.number}</span><p>${step.detail}</p></article>`).join('') || `<article class="step"><span class="step-num">1</span><p>${s.processText || 'Proceed to the responsible office for assistance.'}</p></article>`; qs('#charterLink').dataset.page = s.page; qs('#charterLink').dataset.title = s.title; show('detailScreen') }
+    function openCharter() { const page = qs('#charterLink').dataset.page; if (!page) return; qs('#pdfTitle').textContent = `Charter page ${page}`; qs('#pdfFrame').src = `CITIZEN-CHARTER-2023-4th-edition-updated.pdf#page=${page}`; show('pdfScreen') }
     const keyboardRows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM']; qs('#keyboardKeys').innerHTML = keyboardRows.map(row => `<div class="key-row">${[...row].map(key => `<button class="key" data-key="${key}">${key}</button>`).join('')}</div>`).join('') + `<div class="key-row"><button class="key wide" data-key-action="backspace">⌫ Backspace</button><button class="key space" data-key=" ">Space</button><button class="key wide" data-key-action="clear">Clear</button></div>`;
     function openKeyboard(input) { activeSearch = input; qs('#keyboard').classList.add('show'); qs('#keyboard').setAttribute('aria-hidden', 'false') }
     qsa('input[type="search"]').forEach(input => input.addEventListener('focus', () => openKeyboard(input)));
     qs('#keyboard').addEventListener('pointerdown', e => e.preventDefault()); qs('#keyboard').addEventListener('click', e => { const key = e.target.closest('[data-key]'), action = e.target.closest('[data-key-action]'); if (action?.dataset.keyAction === 'close') { closeKeyboard(); return } if (!activeSearch) return; if (action?.dataset.keyAction === 'backspace') activeSearch.value = activeSearch.value.slice(0, -1); else if (action?.dataset.keyAction === 'clear') activeSearch.value = ''; else if (key) activeSearch.value += key.dataset.key.toLowerCase(); activeSearch.dispatchEvent(new Event('input', { bubbles: true })) });
-    qs('#departments').addEventListener('click', e => { const b = e.target.closest('[data-dept]'); if (b) openDepartment(b.dataset.dept) }); qs('#serviceList').addEventListener('click', e => { const b = e.target.closest('[data-service]'); if (b) openService(b.dataset.service) }); qs('#deptSearch').addEventListener('input', e => { qs('#clearDept').classList.toggle('show', !!e.target.value); renderDepartments(e.target.value) }); qs('#clearDept').addEventListener('click', () => { qs('#deptSearch').value = ''; qs('#clearDept').classList.remove('show'); renderDepartments(); qs('#deptSearch').focus() }); qs('#serviceSearch').addEventListener('input', renderServices); qs('#clearService').addEventListener('click', () => { qs('#serviceSearch').value = ''; renderServices(); qs('#serviceSearch').focus() }); qs('#directorySearch').addEventListener('input', e => renderDirectory(e.target.value)); qs('#clearDirectory').addEventListener('click', () => { qs('#directorySearch').value = ''; renderDirectory(); qs('#directorySearch').focus() }); qsa('[data-open]').forEach(b => b.addEventListener('click', () => show(b.dataset.open))); qsa('[data-back]').forEach(b => b.addEventListener('click', () => show(b.dataset.back))); qs('#homeBtn').addEventListener('click', () => { qs('#deptSearch').value = ''; renderDepartments(); show('homeScreen') });
+    qs('#departments').addEventListener('click', e => { const b = e.target.closest('[data-dept]'); if (b) openDepartment(b.dataset.dept) }); qs('#serviceList').addEventListener('click', e => { const b = e.target.closest('[data-service]'); if (b) openService(b.dataset.service) }); qs('#charterLink').addEventListener('click', openCharter); qs('#deptSearch').addEventListener('input', e => { qs('#clearDept').classList.toggle('show', !!e.target.value); renderDepartments(e.target.value) }); qs('#clearDept').addEventListener('click', () => { qs('#deptSearch').value = ''; qs('#clearDept').classList.remove('show'); renderDepartments(); qs('#deptSearch').focus() }); qs('#serviceSearch').addEventListener('input', renderServices); qs('#clearService').addEventListener('click', () => { qs('#serviceSearch').value = ''; renderServices(); qs('#serviceSearch').focus() }); qs('#directorySearch').addEventListener('input', e => renderDirectory(e.target.value)); qs('#clearDirectory').addEventListener('click', () => { qs('#directorySearch').value = ''; renderDirectory(); qs('#directorySearch').focus() }); qsa('[data-open]').forEach(b => b.addEventListener('click', () => show(b.dataset.open))); qsa('[data-back]').forEach(b => b.addEventListener('click', () => show(b.dataset.back))); qs('#homeBtn').addEventListener('click', () => { qs('#deptSearch').value = ''; renderDepartments(); show('homeScreen') });
     function resetIdle() { clearTimeout(idleTimer); qs('#idle').classList.add('reset'); void qs('#idle').offsetWidth; qs('#idle').classList.remove('reset'); idleTimer = setTimeout(() => show('homeScreen'), 90000) } ['pointerdown', 'keydown', 'scroll'].forEach(ev => document.addEventListener(ev, resetIdle, { passive: true })); function tick() { const now = new Date(); qs('#clock').textContent = new Intl.DateTimeFormat('en-PH', { hour: 'numeric', minute: '2-digit' }).format(now); qs('#date').textContent = new Intl.DateTimeFormat('en-PH', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).format(now) }
     qs('#mandate').textContent = profile.mandate; qs('#vision').textContent = profile.vision; qs('#mission').textContent = profile.mission; qs('#pledge').textContent = profile.pledge; renderDepartments(); renderDirectory(); if (/^#service-\d+$/.test(location.hash)) { const s = byId.get(location.hash.slice(1)); if (s) { activeDepartment = departments.find(d => d.name === s.department); openService(s.id) } } else if (location.hash === '#directory') show('directoryScreen'); else if (location.hash === '#profile') show('profileScreen'); else if (location.hash === '#search') qs('#deptSearch').focus(); tick(); setInterval(tick, 30000); resetIdle();
   </script>
