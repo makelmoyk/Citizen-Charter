@@ -1711,6 +1711,7 @@
     function resetIdle() { clearTimeout(idleTimer); qs('#idle').classList.add('reset'); void qs('#idle').offsetWidth; qs('#idle').classList.remove('reset'); idleTimer = setTimeout(() => show('homeScreen'), 90000) } ['pointerdown', 'keydown', 'scroll'].forEach(ev => document.addEventListener(ev, resetIdle, { passive: true })); function tick() { const now = new Date(); qs('#clock').textContent = new Intl.DateTimeFormat('en-PH', { hour: 'numeric', minute: '2-digit' }).format(now); qs('#date').textContent = new Intl.DateTimeFormat('en-PH', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).format(now) }
     qs('#mandate').textContent = profile.mandate; qs('#vision').textContent = profile.vision; qs('#mission').textContent = profile.mission; qs('#pledge').textContent = profile.pledge; renderDepartments(); renderDirectory(); if (/^#service-\d+$/.test(location.hash)) { const s = byId.get(location.hash.slice(1)); if (s) { activeDepartment = departments.find(d => d.name === s.department); openService(s.id) } } else if (location.hash === '#directory') show('directoryScreen'); else if (location.hash === '#profile') show('profileScreen'); else if (location.hash === '#search') qs('#deptSearch').focus(); tick(); setInterval(tick, 30000); resetIdle();
   </script>
+  <script src="./charter-pdf-data.js"></script>
   <script src="./vendor/pdfjs/pdf.legacy.min.js"></script>
   <script>
     const pdfjsLib = window.pdfjsLib;
@@ -1733,13 +1734,28 @@
     let renderTask;
     let renderRequest = 0;
 
-    const documentPromise = pdfjsLib.getDocument({
-      url: './CITIZEN-CHARTER-2023-4th-edition-updated.pdf',
+    function embeddedPdfBytes() {
+      const binary = atob(window.CHARTER_PDF_BASE64 || '');
+      const bytes = new Uint8Array(binary.length);
+      for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
+      return bytes;
+    }
+
+    const pdfResources = {
       cMapUrl: './vendor/pdfjs/cmaps/',
       cMapPacked: true,
       standardFontDataUrl: './vendor/pdfjs/standard_fonts/',
       disableAutoFetch: false
-    }).promise;
+    };
+    const useEmbeddedPdf = location.protocol === 'file:';
+    const primarySource = useEmbeddedPdf
+      ? { data: embeddedPdfBytes() }
+      : { url: './CITIZEN-CHARTER-2023-4th-edition-updated.pdf' };
+    const documentPromise = pdfjsLib.getDocument({ ...pdfResources, ...primarySource }).promise.catch(error => {
+      if (useEmbeddedPdf || !window.CHARTER_PDF_BASE64) throw error;
+      console.warn('Direct PDF loading failed; using the bundled offline copy.', error);
+      return pdfjsLib.getDocument({ ...pdfResources, data: embeddedPdfBytes() }).promise;
+    });
 
     async function renderPage() {
       if (!pdfDocument) return;
