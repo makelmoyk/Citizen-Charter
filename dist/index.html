@@ -967,7 +967,7 @@
 
     .step-meta {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 9px
     }
 
@@ -982,7 +982,13 @@
       gap: 5px;
       font-size: 18px;
       font-weight: 800;
-      line-height: 1.35
+      line-height: 1.4;
+      overflow-wrap: anywhere
+    }
+
+    .step-meta .step-meta-staff {
+      grid-column: 1 / -1;
+      min-height: 0
     }
 
     /* Senior-friendly minimum reading sizes throughout the kiosk. */
@@ -1820,7 +1826,7 @@
     function stepParts(detail) {
       let text = friendlyText(detail).replace(/\bNone\b/gi, 'No fee');
       const feeMatch = text.match(/\bNo fee\b|₱\s?[\d,.]+/i);
-      const timePattern = /\b\d+(?:\s*[½¼¾])?\s*(?:working\s+)?(?:seconds?|minutes?|hours?|days?|months?|years?)(?:\s*(?:&|and)\s*\d+(?:\s*[½¼¾])?\s*(?:seconds?|minutes?|hours?|days?|months?|years?))?/i;
+      const timePattern = /\b(?:\d+\s*minutes?\s+for\s+Annual Budget\s+\d+\s*minutes?\s+for\s+Supplemental Budget|\d+(?:\s*[½¼¾])?\s*(?:working\s+)?(?:seconds?|minutes?|hours?|days?|months?|years?)(?:\s*(?:&|and)\s*\d+(?:\s*[½¼¾])?\s*(?:seconds?|minutes?|hours?|days?|months?|years?))?)/i;
       const searchFrom = feeMatch ? feeMatch.index + feeMatch[0].length : 0;
       const relativeTime = text.slice(searchFrom).match(timePattern);
       const timeIndex = relativeTime ? searchFrom + relativeTime.index : -1;
@@ -1838,11 +1844,21 @@
     function renderStep(step) {
       const part = stepParts(step.detail);
       const field = (label, value) => value ? `<div class="step-field"><small>${label}</small><p>${escapeHtml(value)}</p></div>` : '';
-      const meta = [['Fee', part.fee], ['Processing time', part.time], ['Responsible staff', part.staff]].filter(([, value]) => value);
-      return `<article class="step"><span class="step-num">${escapeHtml(step.number)}</span><div class="step-content">${field('Your action', part.client)}${field('City Hall action', part.office)}${meta.length ? `<div class="step-meta">${meta.map(([label, value]) => `<span><small>${label}</small>${escapeHtml(value)}</span>`).join('')}</div>` : ''}</div></article>`;
+      const meta = [['Fee', part.fee, ''], ['Processing time', part.time, ''], ['Responsible staff', part.staff, 'step-meta-staff']].filter(([, value]) => value);
+      return `<article class="step"><span class="step-num">${escapeHtml(step.number)}</span><div class="step-content">${field('Your action', part.client)}${field('City Hall action', part.office)}${meta.length ? `<div class="step-meta">${meta.map(([label, value, className]) => `<span class="${className}"><small>${label}</small>${escapeHtml(value)}</span>`).join('')}</div>` : ''}</div></article>`;
+    }
+    function expandedSteps(steps = []) {
+      return steps.flatMap(step => {
+        const chunks = friendlyText(step.detail).split(/\s+(?=\d+\.\d+\s)/);
+        return chunks.map((chunk, index) => {
+          if (!index) return { ...step, detail: chunk };
+          const match = chunk.match(/^(\d+\.\d+)\s+([\s\S]*)$/);
+          return match ? { number: match[1], detail: match[2] } : { number: `${step.number}.${index}`, detail: chunk };
+        });
+      });
     }
     function openService(id) {
-      const s = byId.get(id), abbr = officeAbbreviations[s.department], requirements = requirementItems(s.requirements);
+      const s = byId.get(id), abbr = officeAbbreviations[s.department], requirements = requirementItems(s.requirements), serviceSteps = expandedSteps(s.steps);
       const transactionLabels = { G2C: 'Service for citizens', G2B: 'Service for businesses', G2G: 'Service for government offices' };
       qs('#serviceTitle').textContent = friendlyText(s.title);
       qs('#serviceOffice').textContent = `${friendlyText(s.office || s.department)}${abbr && !(s.office || '').includes(`(${abbr})`) ? ` (${abbr})` : ''}`;
@@ -1853,7 +1869,7 @@
       qs('#serviceDescription').textContent = friendlyText(s.description) || 'Please ask the responsible office for details about this service.';
       qs('#serviceEligible').textContent = friendlyText(s.eligible) || 'Please ask the responsible office who may apply.';
       qs('#serviceRequirements').innerHTML = requirements.map(item => `<li class="${isHeading(item) ? 'heading' : ''}">${escapeHtml(item)}</li>`).join('') || '<li>No documents are listed for this service.</li>';
-      qs('#serviceSteps').innerHTML = s.steps.length ? s.steps.map(renderStep).join('') : `<article class="step"><span class="step-num">1</span><div class="step-content"><div class="step-field"><small>What to do</small><p>${escapeHtml(friendlyText(s.processText) || 'Proceed to the responsible office for assistance.')}</p></div></div></article>`;
+      qs('#serviceSteps').innerHTML = serviceSteps.length ? serviceSteps.map(renderStep).join('') : `<article class="step"><span class="step-num">1</span><div class="step-content"><div class="step-field"><small>What to do</small><p>${escapeHtml(friendlyText(s.processText) || 'Proceed to the responsible office for assistance.')}</p></div></div></article>`;
       qs('#charterLink').dataset.page = s.page;
       show('detailScreen');
     }
