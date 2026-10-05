@@ -940,9 +940,99 @@
     }
 
     .step p {
-      font-size: 18px;
+      font-size: 21px;
       line-height: 1.55;
       margin: 0
+    }
+
+    .step-content {
+      min-width: 0;
+      display: grid;
+      gap: 14px
+    }
+
+    .step-field {
+      display: grid;
+      gap: 5px
+    }
+
+    .step-field small,
+    .step-meta small {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .07em;
+      text-transform: uppercase
+    }
+
+    .step-meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px
+    }
+
+    .step-meta span {
+      min-height: 72px;
+      padding: 11px 12px;
+      border: 2px solid var(--line);
+      border-radius: 13px;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.35
+    }
+
+    /* Senior-friendly minimum reading sizes throughout the kiosk. */
+    .dept b,
+    .service b,
+    .info-card b,
+    .directory-name {
+      font-size: 22px
+    }
+
+    .dept span span,
+    .service .meta,
+    .service .page,
+    .info-card small,
+    .directory-office,
+    .directory-phone,
+    .profile-card p {
+      font-size: 19px
+    }
+
+    .box p {
+      font-size: 22px;
+      line-height: 1.65
+    }
+
+    .reqs li {
+      font-size: 21px;
+      line-height: 1.55
+    }
+
+    .note {
+      font-size: 19px
+    }
+
+    @media(max-width:700px) {
+      .step-meta {
+        grid-template-columns: 1fr
+      }
+
+      .step,
+      .box,
+      .fact {
+        padding: 20px
+      }
+
+      .box p,
+      .step p,
+      .reqs li {
+        font-size: 20px
+      }
     }
 
     .note {
@@ -951,7 +1041,7 @@
       border-radius: 17px;
       padding: 20px 22px;
       margin-top: 16px;
-      font-size: 17px;
+      font-size: 19px;
       line-height: 1.55
     }
 
@@ -1586,7 +1676,7 @@
               <path d="m15 18-6-6 6-6" />
             </svg></button>
           <div>
-            <div class="kicker">Complete frontline service</div>
+            <div class="kicker">Service details</div>
             <h2 id="serviceTitle"></h2>
           </div>
         </div>
@@ -1604,7 +1694,7 @@
           <p id="serviceDescription"></p>
         </div>
         <div class="box">
-          <h4>Who may avail</h4>
+          <h4>Who can apply</h4>
           <p id="serviceEligible"></p>
         </div>
         <div class="box">
@@ -1612,11 +1702,11 @@
           <ul class="reqs" id="serviceRequirements"></ul>
         </div>
         <div class="box">
-          <h4>How to avail of the service</h4>
+          <h4>Steps to receive this service</h4>
           <div class="steps" id="serviceSteps"></div>
         </div>
-        <div class="note">Each step preserves the published client action, agency action, applicable fee, processing
-          time, and responsible personnel. Confirm any updated requirement or fee with the responsible office.</div>
+        <div class="note">This information comes from the 2023 Citizen’s Charter. Please ask the responsible office to
+          confirm current requirements, fees, and processing times.</div>
         <button class="charter-link" id="charterLink" type="button">Open this page in the Citizen’s Charter</button>
       </section>
       <section class="screen" id="pdfScreen">
@@ -1708,7 +1798,65 @@
     function openDepartment(name) { activeDepartment = departments.find(d => d.name === name); qs('#departmentTitle').textContent = officeLabel(activeDepartment.name); qs('#departmentSummary').textContent = `${activeDepartment.services.length} published service${activeDepartment.services.length === 1 ? '' : 's'}`; qs('#serviceSearch').value = ''; renderServices(); show('departmentScreen') }
     function renderServices() { const term = qs('#serviceSearch').value.trim().toLowerCase(); const list = activeDepartment.services.map(id => byId.get(id)).filter(s => (s.title + ' ' + s.description).toLowerCase().includes(term)); qs('#clearService').classList.toggle('show', !!term); qs('#serviceList').innerHTML = list.map(s => `<button class="service" data-service="${s.id}"><b>${s.title}</b><span class="meta">${s.classification} · ${s.duration}</span><span class="page">Page ${s.page}</span></button>`).join(''); qs('#serviceEmpty').classList.toggle('show', !list.length) }
     function isHeading(text) { return /^(NEW|RENEWAL|REGULATORY)$/.test(text) || /^FOR [A-Z].*:?$/.test(text) }
-    function openService(id) { const s = byId.get(id), abbr = officeAbbreviations[s.department]; qs('#serviceTitle').textContent = s.title; qs('#serviceOffice').textContent = `${s.office || s.department}${abbr && !(s.office || '').includes(`(${abbr})`) ? ` (${abbr})` : ''}`; qs('#servicePage').textContent = `Charter page ${s.page}`; qs('#serviceTransaction').textContent = s.transaction || 'External service'; qs('#serviceClass').textContent = s.classification || 'Not specified'; qs('#serviceDuration').textContent = s.duration || 'Not specified'; qs('#serviceDescription').textContent = s.description || 'Refer to the published Citizen’s Charter for this service.'; qs('#serviceEligible').textContent = s.eligible || 'General public / qualified applicants'; qs('#serviceRequirements').innerHTML = s.requirements.map(r => `<li class="${isHeading(r) ? 'heading' : ''}">${r}</li>`).join('') || '<li>No documentary requirement is listed.</li>'; qs('#serviceSteps').innerHTML = s.steps.map(step => `<article class="step"><span class="step-num">${step.number}</span><p>${step.detail}</p></article>`).join('') || `<article class="step"><span class="step-num">1</span><p>${s.processText || 'Proceed to the responsible office for assistance.'}</p></article>`; qs('#charterLink').dataset.page = s.page; show('detailScreen') }
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+    function friendlyText(value) {
+      return String(value ?? '')
+        .replace(/â€™|â€˜/g, '’').replace(/â€œ|â€/g, '“').replace(/â€“|â€”/g, '–').replace(/Â½/g, '½')
+        .replace(/\|\|+/g, ' / ').replace(/\bP(?=\s?\d)/g, '₱').replace(/\bPhp\s?/gi, '₱')
+        .replace(/\bbonafide\b/gi, 'bona fide').replace(/photo\s*copy/gi, 'photocopy')
+        .replace(/\bO\.R\.(?=\s|$)/gi, 'official receipt').replace(/\s+([,.;:])/g, '$1')
+        .replace(/(^|\s)\.\s+/g, '$1').replace(/\s+/g, ' ').trim();
+    }
+    function requirementItems(requirements = []) {
+      return requirements.flatMap(item => {
+        const text = friendlyText(item);
+        if (!text || isHeading(text)) return text ? [text] : [];
+        if (/^none\.?$/i.test(text)) return ['No document required'];
+        if (/\bif none\b/i.test(text)) return [text];
+        const separators = (text.match(/[,;]/g) || []).length;
+        return separators >= 2 ? text.split(/[,;]\s+/).map(friendlyText).filter(Boolean) : [text];
+      });
+    }
+    function stepParts(detail) {
+      let text = friendlyText(detail).replace(/\bNone\b/gi, 'No fee');
+      const feeMatch = text.match(/\bNo fee\b|₱\s?[\d,.]+/i);
+      const timePattern = /\b\d+(?:\s*[½¼¾])?\s*(?:working\s+)?(?:seconds?|minutes?|hours?|days?|months?|years?)(?:\s*(?:&|and)\s*\d+(?:\s*[½¼¾])?\s*(?:seconds?|minutes?|hours?|days?|months?|years?))?/i;
+      const searchFrom = feeMatch ? feeMatch.index + feeMatch[0].length : 0;
+      const relativeTime = text.slice(searchFrom).match(timePattern);
+      const timeIndex = relativeTime ? searchFrom + relativeTime.index : -1;
+      const cutIndex = feeMatch ? feeMatch.index : timeIndex;
+      const actionsText = friendlyText(cutIndex >= 0 ? text.slice(0, cutIndex) : text);
+      const actionSentences = actionsText.split(/(?<=[.!?])\s+/).map(friendlyText).filter(Boolean);
+      const client = actionSentences.shift() || actionsText || 'Proceed to the responsible office for assistance.';
+      const office = actionSentences.join(' ');
+      const fee = feeMatch ? (/no fee/i.test(feeMatch[0]) ? 'No fee' : feeMatch[0].replace(/\s+/g, '')) : '';
+      const time = relativeTime ? relativeTime[0] : '';
+      const staffStart = timeIndex >= 0 ? timeIndex + time.length : (feeMatch ? feeMatch.index + feeMatch[0].length : text.length);
+      const staff = friendlyText(text.slice(staffStart)).replace(/^[-–:.,\s]+/, '');
+      return { client, office, fee, time, staff };
+    }
+    function renderStep(step) {
+      const part = stepParts(step.detail);
+      const field = (label, value) => value ? `<div class="step-field"><small>${label}</small><p>${escapeHtml(value)}</p></div>` : '';
+      const meta = [['Fee', part.fee], ['Processing time', part.time], ['Responsible staff', part.staff]].filter(([, value]) => value);
+      return `<article class="step"><span class="step-num">${escapeHtml(step.number)}</span><div class="step-content">${field('Your action', part.client)}${field('City Hall action', part.office)}${meta.length ? `<div class="step-meta">${meta.map(([label, value]) => `<span><small>${label}</small>${escapeHtml(value)}</span>`).join('')}</div>` : ''}</div></article>`;
+    }
+    function openService(id) {
+      const s = byId.get(id), abbr = officeAbbreviations[s.department], requirements = requirementItems(s.requirements);
+      const transactionLabels = { G2C: 'Service for citizens', G2B: 'Service for businesses', G2G: 'Service for government offices' };
+      qs('#serviceTitle').textContent = friendlyText(s.title);
+      qs('#serviceOffice').textContent = `${friendlyText(s.office || s.department)}${abbr && !(s.office || '').includes(`(${abbr})`) ? ` (${abbr})` : ''}`;
+      qs('#servicePage').textContent = `Charter page ${s.page}`;
+      qs('#serviceTransaction').textContent = transactionLabels[s.transaction] || friendlyText(s.transaction) || 'Public service';
+      qs('#serviceClass').textContent = friendlyText(s.classification) || 'Please ask the office';
+      qs('#serviceDuration').textContent = friendlyText(s.duration) || 'Please ask the office';
+      qs('#serviceDescription').textContent = friendlyText(s.description) || 'Please ask the responsible office for details about this service.';
+      qs('#serviceEligible').textContent = friendlyText(s.eligible) || 'Please ask the responsible office who may apply.';
+      qs('#serviceRequirements').innerHTML = requirements.map(item => `<li class="${isHeading(item) ? 'heading' : ''}">${escapeHtml(item)}</li>`).join('') || '<li>No documents are listed for this service.</li>';
+      qs('#serviceSteps').innerHTML = s.steps.length ? s.steps.map(renderStep).join('') : `<article class="step"><span class="step-num">1</span><div class="step-content"><div class="step-field"><small>What to do</small><p>${escapeHtml(friendlyText(s.processText) || 'Proceed to the responsible office for assistance.')}</p></div></div></article>`;
+      qs('#charterLink').dataset.page = s.page;
+      show('detailScreen');
+    }
     function openCharter() { const page = Number(qs('#charterLink').dataset.page); if (!page) return; qs('#pdfTitle').textContent = `Charter page ${page}`; show('pdfScreen'); window.pendingPdfPage = page; qs('#pdfLoading').textContent = 'Preparing the Citizen’s Charter…'; qs('#pdfLoading').hidden = false; if (window.KioskPdfReader) window.KioskPdfReader.open(page) }
     const keyboardRows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM']; qs('#keyboardKeys').innerHTML = keyboardRows.map(row => `<div class="key-row">${[...row].map(key => `<button class="key" data-key="${key}">${key}</button>`).join('')}</div>`).join('') + `<div class="key-row"><button class="key wide" data-key-action="backspace">⌫ Backspace</button><button class="key space" data-key=" ">Space</button><button class="key wide" data-key-action="clear">Clear</button></div>`;
     function openKeyboard(input) { activeSearch = input; qs('#keyboard').classList.add('show'); qs('#keyboard').setAttribute('aria-hidden', 'false') }
