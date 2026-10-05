@@ -206,6 +206,7 @@
       padding: 42px 48px 38px;
       overflow-y: auto;
       opacity: 0;
+      visibility: hidden;
       transform: translateX(3%);
       pointer-events: none;
       transition: .28s ease
@@ -213,6 +214,7 @@
 
     .screen.active {
       opacity: 1;
+      visibility: visible;
       transform: none;
       pointer-events: auto
     }
@@ -982,6 +984,8 @@
     }
 
     .pdf-page-stage {
+      box-sizing: border-box;
+      width: max-content;
       min-width: 100%;
       min-height: 100%;
       padding: 22px;
@@ -1012,6 +1016,10 @@
       font-weight: 900;
       text-align: center;
       padding: 30px
+    }
+
+    .pdf-loading[hidden] {
+      display: none
     }
 
     .pdf-controls {
@@ -1625,7 +1633,7 @@
           <div class="pdf-control-group"><button class="pdf-control" id="pdfPrev" type="button">‹ Previous</button></div>
           <div class="pdf-page-status" id="pdfPageStatus">Page —</div>
           <div class="pdf-control-group"><button class="pdf-control" id="pdfZoomOut" type="button"
-              aria-label="Make page smaller">− Smaller</button><span class="pdf-zoom-status" id="pdfZoomStatus">160%</span><button
+              aria-label="Make page smaller">− Smaller</button><span class="pdf-zoom-status" id="pdfZoomStatus">100%</span><button
               class="pdf-control" id="pdfZoomIn" type="button" aria-label="Make page larger">+ Larger</button><button
               class="pdf-control" id="pdfNext" type="button">Next ›</button></div>
         </div>
@@ -1730,7 +1738,8 @@
     const zoomLevels = [1, 1.15, 1.35, 1.6, 1.9, 2.2];
     let pdfDocument;
     let currentPage = 1;
-    let zoomIndex = 3;
+    let zoomIndex = 0;
+    const charterPageOffset = 1;
     let renderTask;
     let renderRequest = 0;
 
@@ -1768,7 +1777,7 @@
           if (error?.name !== 'RenderingCancelledException') console.warn(error);
         }
       }
-      const page = await pdfDocument.getPage(currentPage);
+      const page = await pdfDocument.getPage(currentPage + charterPageOffset);
       if (request !== renderRequest) return;
       const baseViewport = page.getViewport({ scale: 1 });
       const availableWidth = Math.max(reader.clientWidth - 44, 320);
@@ -1780,16 +1789,15 @@
       canvas.height = Math.ceil(viewport.height);
       canvas.style.width = `${Math.round(viewport.width / pixelRatio)}px`;
       canvas.style.height = `${Math.round(viewport.height / pixelRatio)}px`;
-      stage.style.width = `${Math.round(viewport.width / pixelRatio) + 44}px`;
       renderTask = page.render({ canvasContext: context, viewport });
       await renderTask.promise;
       if (request !== renderRequest) return;
       canvas.hidden = false;
       loading.hidden = true;
-      pageStatus.textContent = `Page ${currentPage} of ${pdfDocument.numPages}`;
+      pageStatus.textContent = `Page ${currentPage} of ${pdfDocument.numPages - charterPageOffset}`;
       zoomStatus.textContent = `${Math.round(zoomLevels[zoomIndex] * 100)}%`;
       previousButton.disabled = currentPage <= 1;
-      nextButton.disabled = currentPage >= pdfDocument.numPages;
+      nextButton.disabled = currentPage >= pdfDocument.numPages - charterPageOffset;
       zoomOutButton.disabled = zoomIndex <= 0;
       zoomInButton.disabled = zoomIndex >= zoomLevels.length - 1;
       reader.scrollTop = 0;
@@ -1802,8 +1810,8 @@
       canvas.hidden = true;
       try {
         if (!pdfDocument) pdfDocument = await documentPromise;
-        currentPage = Math.min(Math.max(1, pageNumber), pdfDocument.numPages);
-        zoomIndex = 3;
+        currentPage = Math.min(Math.max(1, pageNumber), pdfDocument.numPages - charterPageOffset);
+        zoomIndex = 0;
         await renderPage();
       } catch (error) {
         console.error(error);
@@ -1813,7 +1821,7 @@
     }
 
     previousButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderPage() } });
-    nextButton.addEventListener('click', () => { if (pdfDocument && currentPage < pdfDocument.numPages) { currentPage++; renderPage() } });
+    nextButton.addEventListener('click', () => { if (pdfDocument && currentPage < pdfDocument.numPages - charterPageOffset) { currentPage++; renderPage() } });
     zoomOutButton.addEventListener('click', () => { if (zoomIndex > 0) { zoomIndex--; renderPage() } });
     zoomInButton.addEventListener('click', () => { if (zoomIndex < zoomLevels.length - 1) { zoomIndex++; renderPage() } });
     window.KioskPdfReader = { open };
