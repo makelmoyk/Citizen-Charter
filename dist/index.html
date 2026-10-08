@@ -110,7 +110,8 @@
     }
 
     .brand {
-      flex: 0 0 auto
+      flex: 1 1 auto;
+      min-width: 0
     }
 
     .brand small {
@@ -123,10 +124,11 @@
     }
 
     .brand h1 {
-      font-size: 36px;
-      line-height: 1;
+      font-size: clamp(42px, 4.7vw, 52px);
+      line-height: .95;
       margin: 8px 0 0;
-      letter-spacing: -.025em
+      letter-spacing: -.035em;
+      white-space: nowrap
     }
 
     .datetime {
@@ -1068,6 +1070,14 @@
       text-decoration: none
     }
 
+    .detail-hero .charter-link {
+      width: 100%;
+      min-height: 64px;
+      margin-top: 18px;
+      font-size: 19px;
+      box-shadow: 0 5px 0 #d7ad00
+    }
+
     .pdf-viewer {
       flex: 1;
       min-height: 0;
@@ -1373,11 +1383,11 @@
       }
 
       .brand h1 {
-        font-size: 22px
+        font-size: 30px
       }
 
       .brand small {
-        font-size: 9px
+        font-size: 10px
       }
 
       .datetime {
@@ -1690,6 +1700,7 @@
           <h3 id="serviceOffice"></h3>
           <div class="chips"><span class="chip" id="servicePage"></span><span class="chip"
               id="serviceTransaction"></span></div>
+          <button class="charter-link" data-charter-link type="button">View this page in the Citizen’s Charter</button>
         </div>
         <div class="facts">
           <div class="fact"><small>Classification</small><strong id="serviceClass"></strong></div>
@@ -1713,7 +1724,8 @@
         </div>
         <div class="note">This information comes from the 2023 Citizen’s Charter. Please ask the responsible office to
           confirm current requirements, fees, and processing times.</div>
-        <button class="charter-link" id="charterLink" type="button">Open this page in the Citizen’s Charter</button>
+        <button class="charter-link" id="charterLink" data-charter-link type="button">Open this page in the Citizen’s
+          Charter</button>
       </section>
       <section class="screen" id="pdfScreen">
         <div class="topline"><button class="back" data-back="detailScreen" aria-label="Back to service details"><svg
@@ -1726,12 +1738,14 @@
           </div>
         </div>
         <div class="pdf-controls" aria-label="PDF reading controls">
-          <div class="pdf-control-group"><button class="pdf-control" id="pdfPrev" type="button">‹ Previous</button></div>
+          <div class="pdf-control-group"><button class="pdf-control" id="pdfPrev" type="button">‹ Previous</button>
+          </div>
           <div class="pdf-page-status" id="pdfPageStatus">Page —</div>
           <div class="pdf-control-group"><button class="pdf-control" id="pdfZoomOut" type="button"
-              aria-label="Make page smaller">− Smaller</button><span class="pdf-zoom-status" id="pdfZoomStatus">100%</span><button
-              class="pdf-control" id="pdfZoomIn" type="button" aria-label="Make page larger">+ Larger</button><button
-              class="pdf-control" id="pdfNext" type="button">Next ›</button></div>
+              aria-label="Make page smaller">− Smaller</button><span class="pdf-zoom-status"
+              id="pdfZoomStatus">100%</span><button class="pdf-control" id="pdfZoomIn" type="button"
+              aria-label="Make page larger">+ Larger</button><button class="pdf-control" id="pdfNext" type="button">Next
+              ›</button></div>
         </div>
         <div class="pdf-viewer" id="pdfViewer">
           <div class="pdf-page-stage" id="pdfStage">
@@ -1765,27 +1779,28 @@
       { name: 'Atty. Antonio A. Bisnar', office: 'City Legal Office', phone: '522-1990' },
       { name: 'Teresita T. Bidiones', office: "City Accountant's Office", phone: '6215-428' },
       { name: 'Edgardo A. Alfon', office: 'City Budget Office', phone: '6211-912' },
-      { name: 'Mimi B. Riano', office: "City Treasurer's Office", phone: '520-7103' },
-      { name: 'Samuel C. Narciso', office: "City Assessor's Office", phone: '522-3987' },
+      { name: 'Agnes E. Alvarez', office: "City Treasurer's Office", phone: '520-7103' },
+      { name: 'David C. Limpin', office: "City Assessor's Office", phone: '522-3987' },
       { name: 'Arnold B. Alarcon, Jr.', office: 'City Planning & Development Office', phone: '620-2787' },
-      { name: 'Antonio V. Amoroso, Jr.', office: "City Engineer's Office", phone: '620-5877' },
-      { name: 'Joanne A. Azarcon', office: 'Human Resource Management Office', phone: '6516-053' },
+      { name: 'Lenard Vega', office: "City Engineer's Office", phone: '620-5877' },
+      { name: 'Wanee C. Aguila', office: 'Human Resource Management Office', phone: '6516-053' },
       { name: 'Lory V. Cahilog', office: 'City Health Office', phone: '6215-686' },
       { name: 'Perseus L. Cordova', office: 'City Social Welfare & Development Office', phone: '620-3190' },
       { name: 'Bryan Mari J. Argos', office: 'City Tourism Office', phone: '6200-544' },
-      { name: 'Mary Ann V. Baria', office: "City Agriculture's Office / City Veterinarian's Office", phone: '6214-913' },
+      { name: 'Mary Ann V. Baria', office: "City Agriculture's Office", phone: '6214-913' },
+      { name: 'Dr. Leah Ingalla', office: "City Veterinarian's Office", phone: '09472888781' },
       { name: 'Dino D. Beluso', office: 'Sangguniang Panlungsod Office', phone: '522-2785' },
       { name: 'Heloise C. Mendoza', office: 'CMO - Market Operation', phone: '09955571145' },
       { name: 'Ronald A. Amigo', office: 'CENRO', phone: '09395168748' },
-      { name: 'Leonardo A. Agana (OIC)', office: "City Civil Registrar's Office", phone: '6211-679' },
+      { name: 'Ike B. Arches', office: "City Civil Registrar's Office", phone: '6211-679' },
       { name: 'Garret Ansel S. Baes (OIC)', office: 'CMO - Fishing Port', phone: '09088884574' },
       { name: 'Caroline T. Dadivas', office: 'PESO', phone: '09190099137' },
-      { name: 'Dennis A. Saneo', office: 'CDRRMO', phone: '' },
+      { name: 'Gilbert F. Fernando', office: 'CDRRMO', phone: '' },
       { name: 'Roselyn L. Estrebilla', office: 'BPLO', phone: '522-7878' },
       { name: 'Edgar Andrade', office: 'TFRU', phone: '6202-216' },
       { name: 'Juvy A. Tabaranza', office: 'Transport Unit', phone: '620-5745' },
       { name: 'Rebecca Y. Andrade', office: 'CMO - Zoning', phone: '09994411989' },
-      { name: 'Salvador Bartocillo, Jr.', office: 'CMO - Housing Unit', phone: '09999923748' },
+      { name: 'Juvy A. Tabaranza', office: 'CMO - Housing Unit', phone: '09999923748' },
       { name: 'Ernesto Dela Cruz', office: 'CMO - OSCA', phone: '09467170558' },
       { name: 'Victor A. Arcenas', office: 'RCITT', phone: '6215-174' },
       { name: 'Richard Delos Reyes', office: 'CMO - ICT', phone: '09989885147' },
@@ -1805,7 +1820,8 @@
     function renderServices() { const term = qs('#serviceSearch').value.trim().toLowerCase(); const list = activeDepartment.services.map(id => byId.get(id)).filter(s => (s.title + ' ' + s.description).toLowerCase().includes(term)); qs('#clearService').classList.toggle('show', !!term); qs('#serviceList').innerHTML = list.map(s => `<button class="service" data-service="${s.id}"><b>${s.title}</b><span class="meta">${s.classification} · ${s.duration}</span><span class="page">Page ${s.page}</span></button>`).join(''); qs('#serviceEmpty').classList.toggle('show', !list.length) }
     function isHeading(text) { return /^(NEW|RENEWAL|REGULATORY)$/.test(text) || /^FOR [A-Z].*:?$/.test(text) }
     const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-    function friendlyText(value) {
+    function friendlyText(value)
+    {
       return String(value ?? '')
         .replace(/â€™|â€˜/g, '’').replace(/â€œ|â€/g, '“').replace(/â€“|â€”/g, '–').replace(/Â½/g, '½')
         .replace(/\|\|+/g, ' / ').replace(/\bP(?=\s?\d)/g, '₱').replace(/\bPhp\s?/gi, '₱')
@@ -1813,8 +1829,10 @@
         .replace(/\bO\.R\.(?=\s|$)/gi, 'official receipt').replace(/\s+([,.;:])/g, '$1')
         .replace(/(^|\s)\.\s+/g, '$1').replace(/\s+/g, ' ').trim();
     }
-    function requirementItems(requirements = []) {
-      return requirements.flatMap(item => {
+    function requirementItems(requirements = [])
+    {
+      return requirements.flatMap(item =>
+      {
         const text = friendlyText(item);
         if (!text || isHeading(text)) return text ? [text] : [];
         if (/^none\.?$/i.test(text)) return ['No document required'];
@@ -1823,7 +1841,8 @@
         return separators >= 2 ? text.split(/[,;]\s+/).map(friendlyText).filter(Boolean) : [text];
       });
     }
-    function stepParts(detail) {
+    function stepParts(detail)
+    {
       let text = friendlyText(detail).replace(/\bNone\b/gi, 'No fee');
       const feeMatch = text.match(/\bNo fee\b|₱\s?[\d,.]+/i);
       const timePattern = /\b(?:\d+\s*minutes?\s+for\s+Annual Budget\s+\d+\s*minutes?\s+for\s+Supplemental Budget|\d+(?:\s*[½¼¾])?\s*(?:working\s+)?(?:seconds?|minutes?|hours?|days?|months?|years?)(?:\s*(?:&|and)\s*\d+(?:\s*[½¼¾])?\s*(?:seconds?|minutes?|hours?|days?|months?|years?))?)/i;
@@ -1841,23 +1860,28 @@
       const staff = friendlyText(text.slice(staffStart)).replace(/^[-–:.,\s]+/, '');
       return { client, office, fee, time, staff };
     }
-    function renderStep(step) {
+    function renderStep(step)
+    {
       const part = stepParts(step.detail);
       const field = (label, value) => value ? `<div class="step-field"><small>${label}</small><p>${escapeHtml(value)}</p></div>` : '';
       const meta = [['Fee', part.fee, ''], ['Processing time', part.time, ''], ['Responsible staff', part.staff, 'step-meta-staff']].filter(([, value]) => value);
       return `<article class="step"><span class="step-num">${escapeHtml(step.number)}</span><div class="step-content">${field('Your action', part.client)}${field('City Hall action', part.office)}${meta.length ? `<div class="step-meta">${meta.map(([label, value, className]) => `<span class="${className}"><small>${label}</small>${escapeHtml(value)}</span>`).join('')}</div>` : ''}</div></article>`;
     }
-    function expandedSteps(steps = []) {
-      return steps.flatMap(step => {
+    function expandedSteps(steps = [])
+    {
+      return steps.flatMap(step =>
+      {
         const chunks = friendlyText(step.detail).split(/\s+(?=\d+\.\d+\s)/);
-        return chunks.map((chunk, index) => {
+        return chunks.map((chunk, index) =>
+        {
           if (!index) return { ...step, detail: chunk };
           const match = chunk.match(/^(\d+\.\d+)\s+([\s\S]*)$/);
           return match ? { number: match[1], detail: match[2] } : { number: `${step.number}.${index}`, detail: chunk };
         });
       });
     }
-    function openService(id) {
+    function openService(id)
+    {
       const s = byId.get(id), abbr = officeAbbreviations[s.department], requirements = requirementItems(s.requirements), serviceSteps = expandedSteps(s.steps);
       const transactionLabels = { G2C: 'Service for citizens', G2B: 'Service for businesses', G2G: 'Service for government offices' };
       qs('#serviceTitle').textContent = friendlyText(s.title);
@@ -1870,15 +1894,15 @@
       qs('#serviceEligible').textContent = friendlyText(s.eligible) || 'Please ask the responsible office who may apply.';
       qs('#serviceRequirements').innerHTML = requirements.map(item => `<li class="${isHeading(item) ? 'heading' : ''}">${escapeHtml(item)}</li>`).join('') || '<li>No documents are listed for this service.</li>';
       qs('#serviceSteps').innerHTML = serviceSteps.length ? serviceSteps.map(renderStep).join('') : `<article class="step"><span class="step-num">1</span><div class="step-content"><div class="step-field"><small>What to do</small><p>${escapeHtml(friendlyText(s.processText) || 'Proceed to the responsible office for assistance.')}</p></div></div></article>`;
-      qs('#charterLink').dataset.page = s.page;
+      qsa('[data-charter-link]').forEach(button => button.dataset.page = s.page);
       show('detailScreen');
     }
-    function openCharter() { const page = Number(qs('#charterLink').dataset.page); if (!page) return; qs('#pdfTitle').textContent = `Charter page ${page}`; show('pdfScreen'); window.pendingPdfPage = page; qs('#pdfLoading').textContent = 'Preparing the Citizen’s Charter…'; qs('#pdfLoading').hidden = false; if (window.KioskPdfReader) window.KioskPdfReader.open(page) }
+    function openCharter(event) { const page = Number(event?.currentTarget?.dataset.page || qs('#charterLink').dataset.page); if (!page) return; qs('#pdfTitle').textContent = `Charter page ${page}`; show('pdfScreen'); window.pendingPdfPage = page; qs('#pdfLoading').textContent = 'Preparing the Citizen’s Charter…'; qs('#pdfLoading').hidden = false; if (window.KioskPdfReader) window.KioskPdfReader.open(page) }
     const keyboardRows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM']; qs('#keyboardKeys').innerHTML = keyboardRows.map(row => `<div class="key-row">${[...row].map(key => `<button class="key" data-key="${key}">${key}</button>`).join('')}</div>`).join('') + `<div class="key-row"><button class="key wide" data-key-action="backspace">⌫ Backspace</button><button class="key space" data-key=" ">Space</button><button class="key wide" data-key-action="clear">Clear</button></div>`;
     function openKeyboard(input) { activeSearch = input; qs('#keyboard').classList.add('show'); qs('#keyboard').setAttribute('aria-hidden', 'false') }
     qsa('input[type="search"]').forEach(input => input.addEventListener('focus', () => openKeyboard(input)));
     qs('#keyboard').addEventListener('pointerdown', e => e.preventDefault()); qs('#keyboard').addEventListener('click', e => { const key = e.target.closest('[data-key]'), action = e.target.closest('[data-key-action]'); if (action?.dataset.keyAction === 'close') { closeKeyboard(); return } if (!activeSearch) return; if (action?.dataset.keyAction === 'backspace') activeSearch.value = activeSearch.value.slice(0, -1); else if (action?.dataset.keyAction === 'clear') activeSearch.value = ''; else if (key) activeSearch.value += key.dataset.key.toLowerCase(); activeSearch.dispatchEvent(new Event('input', { bubbles: true })) });
-    qs('#charterLink').addEventListener('click', openCharter);
+    qsa('[data-charter-link]').forEach(button => button.addEventListener('click', openCharter));
     qs('#departments').addEventListener('click', e => { const b = e.target.closest('[data-dept]'); if (b) openDepartment(b.dataset.dept) }); qs('#serviceList').addEventListener('click', e => { const b = e.target.closest('[data-service]'); if (b) openService(b.dataset.service) }); qs('#deptSearch').addEventListener('input', e => { qs('#clearDept').classList.toggle('show', !!e.target.value); renderDepartments(e.target.value) }); qs('#clearDept').addEventListener('click', () => { qs('#deptSearch').value = ''; qs('#clearDept').classList.remove('show'); renderDepartments(); qs('#deptSearch').focus() }); qs('#serviceSearch').addEventListener('input', renderServices); qs('#clearService').addEventListener('click', () => { qs('#serviceSearch').value = ''; renderServices(); qs('#serviceSearch').focus() }); qs('#directorySearch').addEventListener('input', e => renderDirectory(e.target.value)); qs('#clearDirectory').addEventListener('click', () => { qs('#directorySearch').value = ''; renderDirectory(); qs('#directorySearch').focus() }); qsa('[data-open]').forEach(b => b.addEventListener('click', () => show(b.dataset.open))); qsa('[data-back]').forEach(b => b.addEventListener('click', () => show(b.dataset.back))); qs('#homeBtn').addEventListener('click', () => { qs('#deptSearch').value = ''; renderDepartments(); show('homeScreen') });
     function resetIdle() { clearTimeout(idleTimer); qs('#idle').classList.add('reset'); void qs('#idle').offsetWidth; qs('#idle').classList.remove('reset'); idleTimer = setTimeout(() => show('homeScreen'), 90000) } ['pointerdown', 'keydown', 'scroll'].forEach(ev => document.addEventListener(ev, resetIdle, { passive: true })); function tick() { const now = new Date(); qs('#clock').textContent = new Intl.DateTimeFormat('en-PH', { hour: 'numeric', minute: '2-digit' }).format(now); qs('#date').textContent = new Intl.DateTimeFormat('en-PH', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).format(now) }
     qs('#mandate').textContent = profile.mandate; qs('#vision').textContent = profile.vision; qs('#mission').textContent = profile.mission; qs('#pledge').textContent = profile.pledge; renderDepartments(); renderDirectory(); if (/^#service-\d+$/.test(location.hash)) { const s = byId.get(location.hash.slice(1)); if (s) { activeDepartment = departments.find(d => d.name === s.department); openService(s.id) } } else if (location.hash === '#directory') show('directoryScreen'); else if (location.hash === '#profile') show('profileScreen'); else if (location.hash === '#search') qs('#deptSearch').focus(); tick(); setInterval(tick, 30000); resetIdle();
@@ -1907,7 +1931,8 @@
     let renderTask;
     let renderRequest = 0;
 
-    function embeddedPdfBytes() {
+    function embeddedPdfBytes()
+    {
       const binary = atob(window.CHARTER_PDF_BASE64 || '');
       const bytes = new Uint8Array(binary.length);
       for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
@@ -1924,20 +1949,24 @@
     const primarySource = useEmbeddedPdf
       ? { data: embeddedPdfBytes() }
       : { url: './CITIZEN-CHARTER-2023-4th-edition-updated.pdf' };
-    const documentPromise = pdfjsLib.getDocument({ ...pdfResources, ...primarySource }).promise.catch(error => {
+    const documentPromise = pdfjsLib.getDocument({ ...pdfResources, ...primarySource }).promise.catch(error =>
+    {
       if (useEmbeddedPdf || !window.CHARTER_PDF_BASE64) throw error;
       console.warn('Direct PDF loading failed; using the bundled offline copy.', error);
       return pdfjsLib.getDocument({ ...pdfResources, data: embeddedPdfBytes() }).promise;
     });
 
-    async function renderPage() {
+    async function renderPage()
+    {
       if (!pdfDocument) return;
       const request = ++renderRequest;
       loading.hidden = false;
       loading.textContent = `Loading page ${currentPage}…`;
       canvas.hidden = true;
-      if (renderTask) {
-        try { renderTask.cancel(); await renderTask.promise } catch (error) {
+      if (renderTask)
+      {
+        try { renderTask.cancel(); await renderTask.promise } catch (error)
+        {
           if (error?.name !== 'RenderingCancelledException') console.warn(error);
         }
       }
@@ -1968,16 +1997,19 @@
       reader.scrollLeft = Math.max(0, (reader.scrollWidth - reader.clientWidth) / 2);
     }
 
-    async function open(pageNumber) {
+    async function open(pageNumber)
+    {
       loading.hidden = false;
       loading.textContent = 'Preparing the Citizen’s Charter…';
       canvas.hidden = true;
-      try {
+      try
+      {
         if (!pdfDocument) pdfDocument = await documentPromise;
         currentPage = Math.min(Math.max(1, pageNumber), pdfDocument.numPages - charterPageOffset);
         zoomIndex = 0;
         await renderPage();
-      } catch (error) {
+      } catch (error)
+      {
         console.error(error);
         loading.hidden = false;
         loading.textContent = 'The page could not be displayed. Please return and try again.';
@@ -1991,7 +2023,8 @@
     window.KioskPdfReader = { open };
     if (window.pendingPdfPage) open(Number(window.pendingPdfPage));
     const directPage = location.hash.match(/^#pdf-page-(\d+)$/);
-    if (directPage) {
+    if (directPage)
+    {
       document.querySelector('#pdfTitle').textContent = `Charter page ${directPage[1]}`;
       window.show('pdfScreen');
       open(Number(directPage[1]));
