@@ -1272,6 +1272,108 @@
       animation: none
     }
 
+    .idle-warning {
+      position: absolute;
+      inset: 0;
+      z-index: 200;
+      padding: 44px;
+      background: rgba(4, 18, 62, .82);
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .2s ease, visibility .2s ease
+    }
+
+    .idle-warning.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto
+    }
+
+    .idle-warning-card {
+      width: min(100%, 760px);
+      padding: 48px;
+      border: 5px solid var(--gold);
+      border-radius: 32px;
+      background: white;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .35);
+      text-align: center
+    }
+
+    .idle-warning-icon {
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      font-size: 42px;
+      font-weight: 950
+    }
+
+    .idle-warning h2 {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.1
+    }
+
+    .idle-warning p {
+      margin: 18px auto 28px;
+      color: var(--muted);
+      font-size: 23px;
+      line-height: 1.5
+    }
+
+    .idle-countdown {
+      color: var(--ink);
+      font-weight: 950
+    }
+
+    .idle-warning-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    .idle-warning-actions button {
+      min-height: 78px;
+      border: 3px solid var(--line);
+      border-radius: 18px;
+      background: white;
+      color: var(--ink);
+      font-size: 21px;
+      font-weight: 900;
+      padding: 14px 18px
+    }
+
+    .idle-warning-actions .continue-session {
+      border-color: var(--ink2);
+      background: var(--ink2);
+      color: white
+    }
+
+    @media(max-width:700px) {
+      .idle-warning {
+        padding: 22px
+      }
+
+      .idle-warning-card {
+        padding: 32px 24px
+      }
+
+      .idle-warning h2 {
+        font-size: 34px
+      }
+
+      .idle-warning-actions {
+        grid-template-columns: 1fr
+      }
+    }
+
     @keyframes idle {
       to {
         transform: scaleX(0)
@@ -1761,6 +1863,17 @@
       <div id="keyboardKeys"></div>
       <div class="keyboard-hint">Tap letters to type. Results update automatically.</div>
     </section>
+    <section class="idle-warning" id="idleWarning" role="dialog" aria-modal="true" aria-labelledby="idleWarningTitle"
+      aria-hidden="true">
+      <div class="idle-warning-card">
+        <div class="idle-warning-icon" aria-hidden="true">!</div>
+        <h2 id="idleWarningTitle">Are you still using the kiosk?</h2>
+        <p>The main menu will return in <span class="idle-countdown"><span id="idleCountdown">30</span>
+            seconds</span>.</p>
+        <div class="idle-warning-actions"><button type="button" id="idleHome">Return to main menu</button><button
+            type="button" class="continue-session" id="idleContinue">Continue viewing</button></div>
+      </div>
+    </section>
     <div class="idle" id="idle"><i></i></div>
     <footer>
       <div><b>Roxas City Hall</b><br>Public Service Kiosk</div>
@@ -1770,7 +1883,7 @@
   </div>
   <script src="charter-data.js"></script>
   <script>
-    const { profile, departments, services } = window.CHARTER_DATA; const qs = s => document.querySelector(s), qsa = s => [...document.querySelectorAll(s)]; const byId = new Map(services.map(s => [s.id, s])); let activeDepartment = null, activeSearch = null, idleTimer;
+    const { profile, departments, services } = window.CHARTER_DATA; const qs = s => document.querySelector(s), qsa = s => [...document.querySelectorAll(s)]; const byId = new Map(services.map(s => [s.id, s])); let activeDepartment = null, activeSearch = null, idleTimer, idleReturnTimer, idleCountdownTimer;
     const officeAbbreviations = { "City Mayor's Office": 'CMO', 'Business Permit & Licensing Division': 'BPLD', 'Office for Senior Citizens Affairs (OSCA)': 'OSCA', 'Aid to Individuals in Crisis Situation (AICS)': 'AICS', 'City Disaster Risk Reduction & Management Office': 'CDRRMO', 'Tricycle Franchising & Regulation Unit': 'TFRU', 'Public Employment Service Office (PESO)': 'PESO', 'Zoning Unit': 'ZU', 'Sangguniang Panlungsod Office': 'SPO', "City Treasurer's Office": 'CTO', "City Assessor's Office": 'CAO', "City Engineer's Office": 'CEO', 'City Health Office': 'CHO', 'City Planning & Development Office': 'CPDO', 'City Agriculture Office': 'CAgO', "City Veterinarian's Office": 'CVO', "City Civil Registrar's Office": 'CCRO', 'City Social Welfare & Development Office': 'CSWDO', 'City Tourism Office': 'CTO', 'City Budget Office': 'CBO' };
     const officeDirectory = [
       { name: 'Ronnie T. Dadivas', office: "City Mayor's Office", phone: '6212-049' },
@@ -1802,7 +1915,7 @@
       { name: 'Rebecca Y. Andrade', office: 'CMO - Zoning', phone: '09994411989' },
       { name: 'Juvy A. Tabaranza', office: 'CMO - Housing Unit', phone: '09999923748' },
       { name: 'Ernesto Dela Cruz', office: 'CMO - OSCA', phone: '09467170558' },
-      { name: 'Victor A. Arcenas', office: 'RCITT', phone: '6215-174' },
+      { name: 'Rufo J. Arcenas III', office: 'RCITT', phone: '09173000034' },
       { name: 'Richard Delos Reyes', office: 'CMO - ICT', phone: '09989885147' },
       { name: 'Gonzalo Andrada', office: 'CMO - TMU', phone: '09262517366' },
       { name: 'Erwin Deviente', office: 'Slaughter House', phone: '5207-361' },
@@ -1904,7 +2017,23 @@
     qs('#keyboard').addEventListener('pointerdown', e => e.preventDefault()); qs('#keyboard').addEventListener('click', e => { const key = e.target.closest('[data-key]'), action = e.target.closest('[data-key-action]'); if (action?.dataset.keyAction === 'close') { closeKeyboard(); return } if (!activeSearch) return; if (action?.dataset.keyAction === 'backspace') activeSearch.value = activeSearch.value.slice(0, -1); else if (action?.dataset.keyAction === 'clear') activeSearch.value = ''; else if (key) activeSearch.value += key.dataset.key.toLowerCase(); activeSearch.dispatchEvent(new Event('input', { bubbles: true })) });
     qsa('[data-charter-link]').forEach(button => button.addEventListener('click', openCharter));
     qs('#departments').addEventListener('click', e => { const b = e.target.closest('[data-dept]'); if (b) openDepartment(b.dataset.dept) }); qs('#serviceList').addEventListener('click', e => { const b = e.target.closest('[data-service]'); if (b) openService(b.dataset.service) }); qs('#deptSearch').addEventListener('input', e => { qs('#clearDept').classList.toggle('show', !!e.target.value); renderDepartments(e.target.value) }); qs('#clearDept').addEventListener('click', () => { qs('#deptSearch').value = ''; qs('#clearDept').classList.remove('show'); renderDepartments(); qs('#deptSearch').focus() }); qs('#serviceSearch').addEventListener('input', renderServices); qs('#clearService').addEventListener('click', () => { qs('#serviceSearch').value = ''; renderServices(); qs('#serviceSearch').focus() }); qs('#directorySearch').addEventListener('input', e => renderDirectory(e.target.value)); qs('#clearDirectory').addEventListener('click', () => { qs('#directorySearch').value = ''; renderDirectory(); qs('#directorySearch').focus() }); qsa('[data-open]').forEach(b => b.addEventListener('click', () => show(b.dataset.open))); qsa('[data-back]').forEach(b => b.addEventListener('click', () => show(b.dataset.back))); qs('#homeBtn').addEventListener('click', () => { qs('#deptSearch').value = ''; renderDepartments(); show('homeScreen') });
-    function resetIdle() { clearTimeout(idleTimer); qs('#idle').classList.add('reset'); void qs('#idle').offsetWidth; qs('#idle').classList.remove('reset'); idleTimer = setTimeout(() => show('homeScreen'), 90000) } ['pointerdown', 'keydown', 'scroll'].forEach(ev => document.addEventListener(ev, resetIdle, { passive: true })); function tick() { const now = new Date(); qs('#clock').textContent = new Intl.DateTimeFormat('en-PH', { hour: 'numeric', minute: '2-digit' }).format(now); qs('#date').textContent = new Intl.DateTimeFormat('en-PH', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).format(now) }
+    function hideIdleWarning() { clearTimeout(idleReturnTimer); clearInterval(idleCountdownTimer); qs('#idleWarning').classList.remove('show'); qs('#idleWarning').setAttribute('aria-hidden', 'true') }
+    function returnToMainMenu() { hideIdleWarning(); qs('#deptSearch').value = ''; renderDepartments(); show('homeScreen'); resetIdle() }
+    function showIdleWarning() {
+      if (qs('.screen.active')?.id === 'homeScreen') { resetIdle(); return }
+      let seconds = 30;
+      qs('#idleCountdown').textContent = seconds;
+      qs('#idleWarning').classList.add('show');
+      qs('#idleWarning').setAttribute('aria-hidden', 'false');
+      idleCountdownTimer = setInterval(() => { seconds -= 1; qs('#idleCountdown').textContent = Math.max(seconds, 0) }, 1000);
+      idleReturnTimer = setTimeout(returnToMainMenu, 30000);
+    }
+    function resetIdle() { clearTimeout(idleTimer); hideIdleWarning(); idleTimer = setTimeout(showIdleWarning, 270000) }
+    ['pointerdown', 'keydown', 'scroll'].forEach(ev => document.addEventListener(ev, resetIdle, { passive: true }));
+    qs('#idleWarning').addEventListener('pointerdown', e => e.stopPropagation());
+    qs('#idleContinue').addEventListener('click', resetIdle);
+    qs('#idleHome').addEventListener('click', returnToMainMenu);
+    function tick() { const now = new Date(); qs('#clock').textContent = new Intl.DateTimeFormat('en-PH', { hour: 'numeric', minute: '2-digit' }).format(now); qs('#date').textContent = new Intl.DateTimeFormat('en-PH', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).format(now) }
     qs('#mandate').textContent = profile.mandate; qs('#vision').textContent = profile.vision; qs('#mission').textContent = profile.mission; qs('#pledge').textContent = profile.pledge; renderDepartments(); renderDirectory(); if (/^#service-\d+$/.test(location.hash)) { const s = byId.get(location.hash.slice(1)); if (s) { activeDepartment = departments.find(d => d.name === s.department); openService(s.id) } } else if (location.hash === '#directory') show('directoryScreen'); else if (location.hash === '#profile') show('profileScreen'); else if (location.hash === '#search') qs('#deptSearch').focus(); tick(); setInterval(tick, 30000); resetIdle();
   </script>
   <script src="./charter-pdf-data.js"></script>
