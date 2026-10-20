@@ -590,9 +590,7 @@
     }
 
     .directory-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
+      display: block;
       margin-bottom: 18px
     }
 
@@ -601,16 +599,15 @@
     }
 
     .directory-head h3 {
-      font-size: 32px;
+      font-size: 26px;
       margin: 0
     }
 
     .directory-head p {
-      font-size: 16px;
+      font-size: 20px;
       color: var(--muted);
-      max-width: 360px;
-      text-align: right;
-      margin: 0;
+      text-align: left;
+      margin: 8px 0 0;
       line-height: 1.45
     }
 
@@ -623,20 +620,71 @@
 
     .directory-list {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px
     }
 
     .directory-card {
       background: white;
-      border: 3px solid var(--line);
-      border-radius: 22px;
-      padding: 20px;
-      display: grid;
-      grid-template-columns: 52px 1fr;
-      gap: 15px;
-      align-items: start;
-      min-height: 144px
+      border: 2px solid var(--line);
+      border-radius: 20px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden
+    }
+
+    .directory-card-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 24px;
+      gap: 16px
+    }
+
+    .directory-card .directory-office {
+      display: block;
+      color: var(--ink);
+      font-size: 25px;
+      line-height: 1.3;
+      font-weight: 850;
+      overflow-wrap: anywhere
+    }
+
+    .directory-contact {
+      display: flex;
+      flex-direction: column;
+      gap: 5px
+    }
+
+    .directory-field-label {
+      font-size: 17px;
+      color: var(--muted);
+      font-weight: 650
+    }
+
+    .directory-card .directory-name {
+      display: block;
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.4;
+      font-weight: 650
+    }
+
+    .directory-results {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px 20px;
+      margin: 24px 0 16px;
+      font-size: 19px;
+      line-height: 1.4;
+      color: var(--muted)
+    }
+
+    .directory-results strong {
+      color: var(--ink)
     }
 
     button.directory-card {
@@ -645,13 +693,13 @@
       font: inherit;
       text-align: left;
       cursor: pointer;
-      box-shadow: 0 7px 0 rgba(15, 55, 150, .12);
+      box-shadow: 0 4px 14px rgba(15, 55, 150, .06);
       transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease
     }
 
     button.directory-card:active {
-      transform: translateY(4px);
-      box-shadow: 0 3px 0 rgba(15, 55, 150, .12)
+      transform: translateY(2px);
+      border-color: var(--ink2)
     }
 
     button.directory-card:focus-visible {
@@ -661,29 +709,41 @@
 
     .directory-services {
       display: flex;
-      width: max-content;
-      max-width: 100%;
       align-items: center;
-      gap: 7px;
-      margin-top: 12px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: var(--ink2);
-      color: white;
-      font-size: 16px;
-      font-weight: 950
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 76px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--line);
+      background: var(--pale);
+      color: var(--ink2);
+      font-size: 22px;
+      font-weight: 800
     }
 
-    .directory-index {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      background: var(--gold);
-      color: var(--ink);
+    .directory-services .directory-arrow {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--ink2);
+      color: white;
       display: grid;
       place-items: center;
-      font-size: 17px;
-      font-weight: 950
+      font-size: 30px;
+      line-height: 1
+    }
+
+    .directory-contact-only {
+      padding: 16px 24px;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      border-top: 1px solid var(--line);
+      font-size: 18px;
+      line-height: 1.4;
+      color: var(--muted);
+      background: var(--paper)
     }
 
     .directory-name {
@@ -703,15 +763,16 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      margin-top: 11px;
+      margin-top: 0;
       color: var(--ink2);
       font-size: 17px;
       font-weight: 900
     }
 
     .directory-phone svg {
-      width: 18px;
-      height: 18px
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0
     }
 
     .directory-phone.missing {
@@ -1779,7 +1840,7 @@
             <div>
               <h3>Department &amp; Unit Heads</h3>
             </div>
-            <p>Published office directory from the uploaded Citizen’s Charter.</p>
+            <p>Find your office and contact person. Tap a card marked “View services” to continue.</p>
           </div>
           <div class="directory-note">Telephone numbers are reproduced from the 2023 Citizen’s Charter. Entries without
             a published number are marked “Not listed in charter.”</div>
@@ -1791,6 +1852,8 @@
               placeholder="Search a name, office, or telephone number…"
               aria-label="Search department and unit heads"><button class="clear" id="clearDirectory"
               aria-label="Clear office directory search">×</button></div>
+          <div class="directory-results"><strong id="directoryCount" role="status"
+              aria-live="polite"></strong><span>Names &amp; contacts · 2023 Charter</span></div>
           <div class="directory-list" id="directoryList"></div>
           <div class="empty" id="directoryEmpty">
             <h4>No directory entry found</h4>
@@ -1951,7 +2014,7 @@
       { name: 'Juvy A. Tabaranza', office: 'CMO - Housing Unit', phone: '09999923748' },
       { name: 'Ernesto Dela Cruz', office: 'CMO - OSCA', phone: '09467170558' },
       { name: 'Rufo J. Arcenas III', office: 'RCITT', phone: '09173000034' },
-      { name: 'Richard Delos Reyes', office: 'CMO - ICT', phone: '09262517366' },
+      { name: 'Richard Delos Reyes', office: 'ICT', phone: '09262517366' },
       { name: 'Gonzalo Andrada', office: 'CMO - TMU', phone: '09262517366' },
       { name: 'Erwin Deviente', office: 'Slaughter House', phone: '5207-361' },
       { name: 'Arni Diosdado Artates', office: 'DRCC', phone: '09485600607' },
@@ -1963,22 +2026,31 @@
     function closeKeyboard() { const input = activeSearch; qs('#keyboard').classList.remove('show'); qs('#keyboard').setAttribute('aria-hidden', 'true'); activeSearch = null; if (input) input.blur() }
     function show(id) { closeKeyboard(); qs('.kiosk').classList.toggle('pdf-open', id === 'pdfScreen'); qsa('.screen').forEach(s => s.classList.toggle('active', s.id === id)); qs('#homeBtn').classList.toggle('show', id !== 'homeScreen' && id !== 'pdfScreen'); qs('#' + id).scrollTop = 0 }
     function renderDepartments(term = '') { const value = term.trim().toLowerCase(); const visible = departments.filter(d => (d.name + ' ' + (officeAbbreviations[d.name] || '')).toLowerCase().includes(value)); qs('#deptCount').textContent = `${visible.length} of ${departments.length} departments`; qs('#departments').innerHTML = visible.map(d => `<button class="dept" data-dept="${d.name.replace(/"/g, '&quot;')}"><span class="dept-icon">${String(departments.indexOf(d) + 1).padStart(2, '0')}</span><span><b>${officeLabel(d.name)}</b><span>${d.services.length} frontline service${d.services.length === 1 ? '' : 's'}</span></span></button>`).join('') + `<div class="empty ${visible.length ? '' : 'show'}"><h4>No department found</h4><p>Try a department name or abbreviation, such as CMO or CHO.</p></div>` }
-    function directoryDepartment(item) {
+    function directoryDepartment(item)
+    {
       const aliases = { 'BPLO': 'BPLD', 'CMO - OSCA': 'OSCA', 'CMO - Zoning': 'ZU' };
       const office = item.office.replace("Agriculture's", 'Agriculture');
       const abbreviation = aliases[item.office] || item.office;
       return departments.find(d => d.name === office || officeAbbreviations[d.name] === abbreviation);
     }
-    function renderDirectory(term = '') {
+    function renderDirectory(term = '')
+    {
       const value = term.trim().toLowerCase();
-      const visible = officeDirectory.filter(item => (item.name + ' ' + item.office + ' ' + item.phone).toLowerCase().includes(value));
+      const visible = officeDirectory.filter(item =>
+      {
+        const department = directoryDepartment(item);
+        return [item.name, item.office, item.phone, department ? officeLabel(department.name) : ''].join(' ').toLowerCase().includes(value);
+      });
       qs('#clearDirectory').classList.toggle('show', !!term);
-      qs('#directoryList').innerHTML = visible.map(item => {
+      qs('#directoryCount').textContent = `${visible.length} of ${officeDirectory.length} offices`;
+      qs('#directoryList').innerHTML = visible.map(item =>
+      {
         const department = directoryDepartment(item);
         const tag = department ? 'button' : 'article';
-        const action = department ? ` type="button" data-directory-dept="${department.name.replace(/"/g, '&quot;')}" aria-label="View services for ${officeLabel(department.name).replace(/"/g, '&quot;')}"` : '';
-        const serviceLink = department ? `<span class="directory-services">View department services <span aria-hidden="true">›</span></span>` : '';
-        return `<${tag} class="directory-card"${action}><span class="directory-index">${String(officeDirectory.indexOf(item) + 1).padStart(2, '0')}</span><div><h4 class="directory-name">${item.name}</h4><div class="directory-office">${item.office}</div><div class="directory-phone ${item.phone ? '' : 'missing'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.6 1.9Z"/></svg>${item.phone || 'Not listed in charter'}</div>${serviceLink}</div></${tag}>`;
+        const action = department ? ` type="button" data-directory-dept="${escapeHtml(department.name)}" aria-label="${escapeHtml(item.name)} — View services for ${escapeHtml(officeLabel(department.name))}"` : '';
+        const serviceLink = department ? `<span class="directory-services"><span>View services (${department.services.length})</span><span class="directory-arrow" aria-hidden="true">›</span></span>` : '<span class="directory-contact-only">Contact information only</span>';
+        const office = department ? officeLabel(department.name) : item.office;
+        return `<${tag} class="directory-card"${action}><span class="directory-card-body"><span class="directory-office">${escapeHtml(office)}</span><span class="directory-contact"><span class="directory-field-label">Department / unit head</span><span class="directory-name">${escapeHtml(item.name)}</span></span><span class="directory-contact"><span class="directory-field-label">Telephone</span><span class="directory-phone ${item.phone ? '' : 'missing'}"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.6 1.9Z"/></svg>${escapeHtml(item.phone || 'Not listed in charter')}</span></span></span>${serviceLink}</${tag}>`;
       }).join('');
       qs('#directoryEmpty').classList.toggle('show', !!term && !visible.length);
     }
