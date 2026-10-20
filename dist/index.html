@@ -639,6 +639,39 @@
       min-height: 144px
     }
 
+    button.directory-card {
+      width: 100%;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 7px 0 rgba(15, 55, 150, .12);
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease
+    }
+
+    button.directory-card:active {
+      transform: translateY(4px);
+      box-shadow: 0 3px 0 rgba(15, 55, 150, .12)
+    }
+
+    button.directory-card:focus-visible {
+      outline: 5px solid var(--gold);
+      outline-offset: 3px
+    }
+
+    .directory-services {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: white;
+      font-size: 16px;
+      font-weight: 950
+    }
+
     .directory-index {
       width: 52px;
       height: 52px;
@@ -1904,7 +1937,7 @@
       { name: 'Dr. Leah Ingalla', office: "City Veterinarian's Office", phone: '09472888781' },
       { name: 'Dino D. Beluso', office: 'Sangguniang Panlungsod Office', phone: '522-2785' },
       { name: 'Heloise C. Mendoza', office: 'CMO - Market Operation', phone: '09955571145' },
-      { name: 'Ronald A. Amigo', office: 'CENRO', phone: '09395168748' },
+      { name: 'Arnold B. Alarcon, Jr.', office: 'CENRO', phone: '620-2787' },
       { name: 'Ike B. Arches', office: "City Civil Registrar's Office", phone: '6211-679' },
       { name: 'Garret Ansel S. Baes (OIC)', office: 'CMO - Fishing Port', phone: '09088884574' },
       { name: 'Caroline T. Dadivas', office: 'PESO', phone: '09190099137' },
@@ -1916,7 +1949,7 @@
       { name: 'Juvy A. Tabaranza', office: 'CMO - Housing Unit', phone: '09999923748' },
       { name: 'Ernesto Dela Cruz', office: 'CMO - OSCA', phone: '09467170558' },
       { name: 'Rufo J. Arcenas III', office: 'RCITT', phone: '09173000034' },
-      { name: 'Richard Delos Reyes', office: 'CMO - ICT', phone: '09989885147' },
+      { name: 'Richard Delos Reyes', office: 'CMO - ICT', phone: '09262517366' },
       { name: 'Gonzalo Andrada', office: 'CMO - TMU', phone: '09262517366' },
       { name: 'Erwin Deviente', office: 'Slaughter House', phone: '5207-361' },
       { name: 'Arni Diosdado Artates', office: 'DRCC', phone: '09485600607' },
@@ -1928,8 +1961,26 @@
     function closeKeyboard() { const input = activeSearch; qs('#keyboard').classList.remove('show'); qs('#keyboard').setAttribute('aria-hidden', 'true'); activeSearch = null; if (input) input.blur() }
     function show(id) { closeKeyboard(); qs('.kiosk').classList.toggle('pdf-open', id === 'pdfScreen'); qsa('.screen').forEach(s => s.classList.toggle('active', s.id === id)); qs('#homeBtn').classList.toggle('show', id !== 'homeScreen' && id !== 'pdfScreen'); qs('#' + id).scrollTop = 0 }
     function renderDepartments(term = '') { const value = term.trim().toLowerCase(); const visible = departments.filter(d => (d.name + ' ' + (officeAbbreviations[d.name] || '')).toLowerCase().includes(value)); qs('#deptCount').textContent = `${visible.length} of ${departments.length} departments`; qs('#departments').innerHTML = visible.map(d => `<button class="dept" data-dept="${d.name.replace(/"/g, '&quot;')}"><span class="dept-icon">${String(departments.indexOf(d) + 1).padStart(2, '0')}</span><span><b>${officeLabel(d.name)}</b><span>${d.services.length} frontline service${d.services.length === 1 ? '' : 's'}</span></span></button>`).join('') + `<div class="empty ${visible.length ? '' : 'show'}"><h4>No department found</h4><p>Try a department name or abbreviation, such as CMO or CHO.</p></div>` }
-    function renderDirectory(term = '') { const value = term.trim().toLowerCase(); const visible = officeDirectory.filter(item => (item.name + ' ' + item.office + ' ' + item.phone).toLowerCase().includes(value)); qs('#clearDirectory').classList.toggle('show', !!term); qs('#directoryList').innerHTML = visible.map(item => `<article class="directory-card"><span class="directory-index">${String(officeDirectory.indexOf(item) + 1).padStart(2, '0')}</span><div><h4 class="directory-name">${item.name}</h4><div class="directory-office">${item.office}</div><div class="directory-phone ${item.phone ? '' : 'missing'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.6 1.9Z"/></svg>${item.phone || 'Not listed in charter'}</div></div></article>`).join(''); qs('#directoryEmpty').classList.toggle('show', !!term && !visible.length) }
-    function openDepartment(name) { activeDepartment = departments.find(d => d.name === name); qs('#departmentTitle').textContent = officeLabel(activeDepartment.name); qs('#departmentSummary').textContent = `${activeDepartment.services.length} published service${activeDepartment.services.length === 1 ? '' : 's'}`; qs('#serviceSearch').value = ''; renderServices(); show('departmentScreen') }
+    function directoryDepartment(item) {
+      const aliases = { 'BPLO': 'BPLD', 'CMO - OSCA': 'OSCA', 'CMO - Zoning': 'ZU' };
+      const office = item.office.replace("Agriculture's", 'Agriculture');
+      const abbreviation = aliases[item.office] || item.office;
+      return departments.find(d => d.name === office || officeAbbreviations[d.name] === abbreviation);
+    }
+    function renderDirectory(term = '') {
+      const value = term.trim().toLowerCase();
+      const visible = officeDirectory.filter(item => (item.name + ' ' + item.office + ' ' + item.phone).toLowerCase().includes(value));
+      qs('#clearDirectory').classList.toggle('show', !!term);
+      qs('#directoryList').innerHTML = visible.map(item => {
+        const department = directoryDepartment(item);
+        const tag = department ? 'button' : 'article';
+        const action = department ? ` type="button" data-directory-dept="${department.name.replace(/"/g, '&quot;')}" aria-label="View services for ${officeLabel(department.name).replace(/"/g, '&quot;')}"` : '';
+        const serviceLink = department ? `<span class="directory-services">View department services <span aria-hidden="true">›</span></span>` : '';
+        return `<${tag} class="directory-card"${action}><span class="directory-index">${String(officeDirectory.indexOf(item) + 1).padStart(2, '0')}</span><div><h4 class="directory-name">${item.name}</h4><div class="directory-office">${item.office}</div><div class="directory-phone ${item.phone ? '' : 'missing'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.6 1.9Z"/></svg>${item.phone || 'Not listed in charter'}</div>${serviceLink}</div></${tag}>`;
+      }).join('');
+      qs('#directoryEmpty').classList.toggle('show', !!term && !visible.length);
+    }
+    function openDepartment(name, backTarget = 'homeScreen') { activeDepartment = departments.find(d => d.name === name); if (!activeDepartment) return; qs('#departmentScreen [data-back]').dataset.back = backTarget; qs('#departmentTitle').textContent = officeLabel(activeDepartment.name); qs('#departmentSummary').textContent = `${activeDepartment.services.length} published service${activeDepartment.services.length === 1 ? '' : 's'}`; qs('#serviceSearch').value = ''; renderServices(); show('departmentScreen') }
     function renderServices() { const term = qs('#serviceSearch').value.trim().toLowerCase(); const list = activeDepartment.services.map(id => byId.get(id)).filter(s => (s.title + ' ' + s.description).toLowerCase().includes(term)); qs('#clearService').classList.toggle('show', !!term); qs('#serviceList').innerHTML = list.map(s => `<button class="service" data-service="${s.id}"><b>${s.title}</b><span class="meta">${s.classification} · ${s.duration}</span><span class="page">Page ${s.page}</span></button>`).join(''); qs('#serviceEmpty').classList.toggle('show', !list.length) }
     function isHeading(text) { return /^(NEW|RENEWAL|REGULATORY)$/.test(text) || /^FOR [A-Z].*:?$/.test(text) }
     const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
@@ -2016,10 +2067,11 @@
     qsa('input[type="search"]').forEach(input => input.addEventListener('focus', () => openKeyboard(input)));
     qs('#keyboard').addEventListener('pointerdown', e => e.preventDefault()); qs('#keyboard').addEventListener('click', e => { const key = e.target.closest('[data-key]'), action = e.target.closest('[data-key-action]'); if (action?.dataset.keyAction === 'close') { closeKeyboard(); return } if (!activeSearch) return; if (action?.dataset.keyAction === 'backspace') activeSearch.value = activeSearch.value.slice(0, -1); else if (action?.dataset.keyAction === 'clear') activeSearch.value = ''; else if (key) activeSearch.value += key.dataset.key.toLowerCase(); activeSearch.dispatchEvent(new Event('input', { bubbles: true })) });
     qsa('[data-charter-link]').forEach(button => button.addEventListener('click', openCharter));
-    qs('#departments').addEventListener('click', e => { const b = e.target.closest('[data-dept]'); if (b) openDepartment(b.dataset.dept) }); qs('#serviceList').addEventListener('click', e => { const b = e.target.closest('[data-service]'); if (b) openService(b.dataset.service) }); qs('#deptSearch').addEventListener('input', e => { qs('#clearDept').classList.toggle('show', !!e.target.value); renderDepartments(e.target.value) }); qs('#clearDept').addEventListener('click', () => { qs('#deptSearch').value = ''; qs('#clearDept').classList.remove('show'); renderDepartments(); qs('#deptSearch').focus() }); qs('#serviceSearch').addEventListener('input', renderServices); qs('#clearService').addEventListener('click', () => { qs('#serviceSearch').value = ''; renderServices(); qs('#serviceSearch').focus() }); qs('#directorySearch').addEventListener('input', e => renderDirectory(e.target.value)); qs('#clearDirectory').addEventListener('click', () => { qs('#directorySearch').value = ''; renderDirectory(); qs('#directorySearch').focus() }); qsa('[data-open]').forEach(b => b.addEventListener('click', () => show(b.dataset.open))); qsa('[data-back]').forEach(b => b.addEventListener('click', () => show(b.dataset.back))); qs('#homeBtn').addEventListener('click', () => { qs('#deptSearch').value = ''; renderDepartments(); show('homeScreen') });
+    qs('#departments').addEventListener('click', e => { const b = e.target.closest('[data-dept]'); if (b) openDepartment(b.dataset.dept) }); qs('#directoryList').addEventListener('click', e => { const b = e.target.closest('[data-directory-dept]'); if (b) openDepartment(b.dataset.directoryDept, 'directoryScreen') }); qs('#serviceList').addEventListener('click', e => { const b = e.target.closest('[data-service]'); if (b) openService(b.dataset.service) }); qs('#deptSearch').addEventListener('input', e => { qs('#clearDept').classList.toggle('show', !!e.target.value); renderDepartments(e.target.value) }); qs('#clearDept').addEventListener('click', () => { qs('#deptSearch').value = ''; qs('#clearDept').classList.remove('show'); renderDepartments(); qs('#deptSearch').focus() }); qs('#serviceSearch').addEventListener('input', renderServices); qs('#clearService').addEventListener('click', () => { qs('#serviceSearch').value = ''; renderServices(); qs('#serviceSearch').focus() }); qs('#directorySearch').addEventListener('input', e => renderDirectory(e.target.value)); qs('#clearDirectory').addEventListener('click', () => { qs('#directorySearch').value = ''; renderDirectory(); qs('#directorySearch').focus() }); qsa('[data-open]').forEach(b => b.addEventListener('click', () => show(b.dataset.open))); qsa('[data-back]').forEach(b => b.addEventListener('click', () => show(b.dataset.back))); qs('#homeBtn').addEventListener('click', () => { qs('#deptSearch').value = ''; renderDepartments(); show('homeScreen') });
     function hideIdleWarning() { clearTimeout(idleReturnTimer); clearInterval(idleCountdownTimer); qs('#idleWarning').classList.remove('show'); qs('#idleWarning').setAttribute('aria-hidden', 'true') }
     function returnToMainMenu() { hideIdleWarning(); qs('#deptSearch').value = ''; renderDepartments(); show('homeScreen'); resetIdle() }
-    function showIdleWarning() {
+    function showIdleWarning()
+    {
       if (qs('.screen.active')?.id === 'homeScreen') { resetIdle(); return }
       let seconds = 30;
       qs('#idleCountdown').textContent = seconds;
