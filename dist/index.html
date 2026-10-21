@@ -2150,10 +2150,22 @@
     qsa('[data-charter-link]').forEach(button => button.addEventListener('click', openCharter));
     qs('#departments').addEventListener('click', e => { const b = e.target.closest('[data-dept]'); if (b) openDepartment(b.dataset.dept) }); qs('#directoryList').addEventListener('click', e => { const b = e.target.closest('[data-directory-dept]'); if (b) openDepartment(b.dataset.directoryDept, 'directoryScreen') }); qs('#serviceList').addEventListener('click', e => { const b = e.target.closest('[data-service]'); if (b) openService(b.dataset.service) }); qs('#deptSearch').addEventListener('input', e => { qs('#clearDept').classList.toggle('show', !!e.target.value); renderDepartments(e.target.value) }); qs('#clearDept').addEventListener('click', () => { qs('#deptSearch').value = ''; qs('#clearDept').classList.remove('show'); renderDepartments(); qs('#deptSearch').focus() }); qs('#serviceSearch').addEventListener('input', renderServices); qs('#clearService').addEventListener('click', () => { qs('#serviceSearch').value = ''; renderServices(); qs('#serviceSearch').focus() }); qs('#directorySearch').addEventListener('input', e => renderDirectory(e.target.value)); qs('#clearDirectory').addEventListener('click', () => { qs('#directorySearch').value = ''; renderDirectory(); qs('#directorySearch').focus() }); qsa('[data-open]').forEach(b => b.addEventListener('click', () => show(b.dataset.open))); qsa('[data-back]').forEach(b => b.addEventListener('click', () => show(b.dataset.back))); qs('#homeBtn').addEventListener('click', () => { qs('#deptSearch').value = ''; renderDepartments(); show('homeScreen') });
     function hideIdleWarning() { clearTimeout(idleReturnTimer); clearInterval(idleCountdownTimer); qs('#idleWarning').classList.remove('show'); qs('#idleWarning').setAttribute('aria-hidden', 'true') }
-    function returnToMainMenu() { hideIdleWarning(); qs('#deptSearch').value = ''; renderDepartments(); show('homeScreen'); resetIdle() }
+    function returnToMainMenu() {
+      hideIdleWarning();
+      closeKeyboard();
+      qsa('input[type="search"]').forEach(input => { input.value = '' });
+      qs('#clearDept').classList.remove('show');
+      qs('#clearService').classList.remove('show');
+      renderDepartments();
+      renderDirectory();
+      if (activeDepartment) renderServices();
+      show('homeScreen');
+      resetIdle();
+    }
     function showIdleWarning()
     {
-      if (qs('.screen.active')?.id === 'homeScreen') { resetIdle(); return }
+      const hasSearch = qsa('input[type="search"]').some(input => input.value !== '');
+      if (qs('.screen.active')?.id === 'homeScreen' && !hasSearch) { resetIdle(); return }
       let seconds = 30;
       qs('#idleCountdown').textContent = seconds;
       qs('#idleWarning').classList.add('show');
