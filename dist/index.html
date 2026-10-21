@@ -2174,7 +2174,9 @@
       idleReturnTimer = setTimeout(returnToMainMenu, 30000);
     }
     function resetIdle() { clearTimeout(idleTimer); hideIdleWarning(); idleTimer = setTimeout(showIdleWarning, 270000) }
-    ['pointerdown', 'keydown', 'scroll'].forEach(ev => document.addEventListener(ev, resetIdle, { passive: true }));
+    ['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, resetIdle, { passive: true }));
+    // Panel scroll events do not bubble; capture activity inside the PDF reader and other screens.
+    document.addEventListener('scroll', resetIdle, { passive: true, capture: true });
     qs('#idleWarning').addEventListener('pointerdown', e => e.stopPropagation());
     qs('#idleContinue').addEventListener('click', resetIdle);
     qs('#idleHome').addEventListener('click', returnToMainMenu);
